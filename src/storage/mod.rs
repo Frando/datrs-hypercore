@@ -119,7 +119,7 @@ where
             return Ok(());
         }
 
-        let range = self.data_offset(index, nodes)?;
+        let range = self.data_offset(index, nodes).await?;
 
         ensure!(
             (range.end - range.start) as usize == data.len(),
