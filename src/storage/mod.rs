@@ -17,6 +17,7 @@ use random_access_memory::RandomAccessMemory;
 use random_access_storage::RandomAccess;
 use sleep_parser::*;
 use std::borrow::Borrow;
+use std::convert::TryInto;
 use std::fmt::Debug;
 use std::ops::Range;
 use std::path::PathBuf;
@@ -274,7 +275,8 @@ where
         async move {
             let bytes = bytes?;
             if not_zeroes(&bytes) {
-                Ok(Signature::from_bytes(&bytes)?)
+                let signature: Signature = (&bytes[..]).try_into()?;
+                Ok(signature)
             } else {
                 Ok(self.next_signature(index + 1).await?)
             }
@@ -291,7 +293,8 @@ where
             .await
             .map_err(|e| anyhow!(e))?;
         ensure!(not_zeroes(&bytes), "No signature found");
-        Ok(Signature::from_bytes(&bytes)?)
+        let signature: Signature = (&bytes[..]).try_into()?;
+        Ok(signature)
     }
 
     /// Write a `Signature` to `self.Signatures`.
